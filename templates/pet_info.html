@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ pet.name }} | Détails</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5e6e3 0%, #f0d8d4 50%, #e8c4bd 100%);
+            padding: 40px;
+            color: #4a4a4a;
+        }
+        .info-card {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            color: #b87169;
+            font-size: 2.5em;
+            margin: 0;
+        }
+        .header p {
+            color: #a85e56;
+            font-weight: 500;
+        }
+        .pet-image {
+            width: 100%;
+            max-width: 300px;
+            height: 300px;
+            border-radius: 15px;
+            object-fit: cover;
+            margin: 0 auto 20px;
+            display: block;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .detail-item {
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 0.9em;
+        }
+        .detail-item strong {
+            display: block;
+            color: #b87169;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+        .personality {
+            margin-top: 20px;
+            padding: 20px;
+            background: #fff6f5;
+            border-radius: 10px;
+            border-left: 5px solid #d4968f;
+        }
+        .personality h3 {
+            color: #b87169;
+            margin-bottom: 10px;
+        }
+        .back-btn {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 10px 20px;
+            background-color: #d4968f;
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            transition: background-color 0.3s;
+        }
+        .back-btn:hover {
+            background-color: #b87169;
+        }
+    </style>
+</head>
+<body>
+    {% if pet %}
+    <div class="info-card">
+        <div class="header">
+            <h1>{{ pet.name }} ({{ pet.species }})</h1>
+            <p>{{ pet.breed }} | {{ pet.age_years }} ans</p>
+        </div>
+
+        <img src="{{ pet.img_url }}" 
+             alt="{{ pet.name }}" 
+             class="pet-image">
+
+        <div class="details-grid">
+            <div class="detail-item"><strong>Sexe</strong> {{ pet.sex }}</div>
+            <div class="detail-item"><strong>Couleur</strong> {{ pet.color }}</div>
+            <div class="detail-item"><strong>Poids</strong> {{ pet.weight_kg }} kg</div>
+            <div class="detail-item"><strong>Arrivée</strong> {{ pet.arrival_date }}</div>
+            <div class="detail-item"><strong>Vacciné</strong> {{ 'Oui' if pet.vaccinated else 'Non' }}</div>
+            <div class="detail-item"><strong>Pucé</strong> {{ 'Oui' if pet.microchipped else 'Non' }}</div>
+            <div class="detail-item"><strong>Énergie</strong> {{ pet.energy_level }}/10</div>
+            <div class="detail-item"><strong>Sociabilité</strong> {{ pet.friendliness_level }}/10</div>
+        </div>
+
+        <div class="personality">
+            <h3>Description de Personnalité</h3>
+            <p>{{ pet.personality_description }}</p>
+        </div>
+
+        <a href="{{ url_for('results') }}" class="back-btn">← Retour aux Matchs</a>
+    </div>
+    {% else %}
+    <div class="info-card">
+        <h2>Détails de l'animal non disponibles</h2>
+        <a href="{{ url_for('home') }}" class="back-btn">Accueil</a>
+    </div>
+    {% endif %}
+</body>
+</html>

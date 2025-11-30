@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenue | Pet Match AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Background Pattern for Paws (subtle light pink/grey SVG) */
+        /* This is a multi-layer background: paw pattern + base gradient */
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            
+            /* Combined Background: Paw Pattern (Data URI SVG) over the gradient */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cpath fill='%23e9dcdb' fill-opacity='0.5' d='M25 50a10 10 0 1 1 0-20 10 10 0 0 1 0 20zm50 0a10 10 0 1 1 0-20 10 10 0 0 1 0 20zm-25 25a10 10 0 1 1 0-20 10 10 0 0 1 0 20zm-25 0a10 10 0 1 1 0-20 10 10 0 0 1 0 20zm30-40a20 20 0 1 1-40 0 20 20 0 0 1 40 0z'/%3E%3C/svg%3E"), 
+                            linear-gradient(135deg, #f5e6e3 0%, #f0d8d4 50%, #e8c4bd 100%);
+            background-repeat: repeat, no-repeat;
+            background-size: 100px 100px, cover;
+            background-position: center center, center center;
+        }
+
+        .welcome-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2); 
+            padding: 50px;
+            max-width: 600px;
+            z-index: 10; 
+            position: relative;
+            transform: scale(1.0); 
+        }
+        h1 {
+            font-size: 3em;
+            color: #b87169;
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 1.2em;
+            color: #a85e56;
+            margin-bottom: 40px;
+            font-weight: 500;
+        }
+        .start-btn {
+            background: linear-gradient(135deg, #d4968f 0%, #b87169 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 20px rgba(212, 150, 143, 0.4);
+            text-decoration: none;
+            display: inline-block;
+        }
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(212, 150, 143, 0.5);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .welcome-container {
+                padding: 30px;
+                margin: 20px;
+                transform: scale(1);
+            }
+            h1 {
+                font-size: 2.5em;
+            }
+            p {
+                font-size: 1em;
+            }
+            .start-btn {
+                font-size: 1em;
+                padding: 12px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-container">
+        <h1>Bienvenue chez Pet Match AI 🐾</h1>
+        <p>
+            **Bonjour !** Démarrez le questionnaire pour trouver votre compagnon idéal.
+        </p>
+        <a href="{{ url_for('start_chat') }}" class="start-btn">Démarrer le Matching</a>
+    </div>
+</body>
+</html>

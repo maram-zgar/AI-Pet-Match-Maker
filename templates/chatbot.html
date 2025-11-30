@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trouve Ton Ami Parfait - Chatbot AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Styles adaptés du fichier précédent pour l'esthétique et la réactivité */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5e6e3 0%, #f0d8d4 50%, #e8c4bd 100%);
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 85vh; /* Plus grand pour l'esthétique */
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #d4968f 0%, #b87169 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 12px 18px;
+            border-radius: 15px;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        .ai-message {
+            background: #f0d8d4;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+            color: #b87169;
+        }
+
+        .user-message {
+            background: #b87169;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-input-area {
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input-area input[type="text"] {
+            flex-grow: 1;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 25px;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .chat-input-area input[type="text"]:focus {
+            border-color: #b87169;
+        }
+
+        .chat-input-area button {
+            background: linear-gradient(135deg, #d4968f 0%, #b87169 100%);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 50%;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-input-area button:hover {
+            transform: translateY(-1px);
+        }
+        
+        .mic-button {
+            background: linear-gradient(135deg, #e8c4bd 0%, #d4968f 100%) !important;
+        }
+
+        .mic-button.listening {
+            animation: pulse 1.5s infinite;
+            background: #e85a4f !important;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(232, 90, 79, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(232, 90, 79, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(232, 90, 79, 0); }
+        }
+
+        .options-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            align-self: flex-start;
+        }
+
+        .option-button {
+            padding: 8px 15px;
+            border: 1px solid #b87169;
+            color: #b87169;
+            background-color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .option-button:hover {
+            background-color: #b87169;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            Pet Match AI 🐾
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <!-- Messages ici -->
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="user-input" placeholder="Tapez votre réponse ici...">
+            <button id="send-button" onclick="handleInput('text')" title="Envoyer">
+                ➤
+            </button>
+            <button id="mic-button" class="mic-button" onclick="handleInput('voice')" title="Saisie Vocale">
+                🎤
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Utilisation des API Web Speech (TTS et STT)
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const synth = window.speechSynthesis;
+        let isListening = false;
+        let currentQuestionKey = null; // Stocke la clé de la question actuelle (ex: 'species_preference')
+
+        // Fonction pour la Synthèse Vocale (Text-to-Speech)
+        function speak(text) {
+            if (synth && text) {
+                // Annuler toute parole en cours
+                synth.cancel(); 
+                const utterance = new SpeechSynthesisUtterance(text);
+                // Utiliser une voix française standard
+                utterance.lang = 'fr-FR'; 
+                // Optionnel: choisir une voix spécifique si disponible
+                // utterance.voice = synth.getVoices().find(voice => voice.name === 'Google français');
+                synth.speak(utterance);
+            }
+        }
+
+        // Fonction pour ajouter un message au chat
+        function addMessage(text, sender, options = []) {
+            const chatMessages = document.getElementById('chat-messages');
+            
+            // 1. Ajouter le message (IA ou Utilisateur)
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(sender === 'ai' ? 'ai-message' : 'user-message');
+            messageDiv.textContent = text; 
+            chatMessages.appendChild(messageDiv);
+
+            // 2. Ajouter les boutons d'options (uniquement pour l'IA)
+            if (sender === 'ai' && options.length > 0) {
+                const optionsContainer = document.createElement('div');
+                optionsContainer.classList.add('options-container');
+
+                options.forEach(option => {
+                    const button = document.createElement('button');
+                    button.classList.add('option-button');
+                    button.textContent = option.label;
+                    // On envoie la VALUE, mais on affiche le LABEL dans le chat
+                    button.onclick = () => sendAnswer(option.value, option.label); 
+                    optionsContainer.appendChild(button);
+                });
+                chatMessages.appendChild(optionsContainer);
+            }
+
+            // Faire défiler vers le bas
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Fonction de Reconnaissance Vocale (Speech-to-Text)
+        function startVoiceInput() {
+            if (!SpeechRecognition) {
+                addMessage("Désolé, votre navigateur ne supporte pas la reconnaissance vocale.", 'ai');
+                return;
+            }
+
+            if (isListening) return;
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'fr-FR';
+            recognition.interimResults = false;
+            
+            const micButton = document.getElementById('mic-button');
+
+            recognition.onstart = function() {
+                isListening = true;
+                micButton.classList.add('listening');
+                console.log('Reconnaissance vocale démarrée...');
+            };
+
+            recognition.onresult = function(event) {
+                const speechResult = event.results[0][0].transcript;
+                document.getElementById('user-input').value = speechResult;
+                // Envoyer comme si l'utilisateur avait tapé
+                document.getElementById('send-button').click(); 
+            };
+
+            recognition.onend = function() {
+                isListening = false;
+                micButton.classList.remove('listening');
+                console.log('Reconnaissance vocale terminée.');
+            };
+
+            recognition.onerror = function(event) {
+                isListening = false;
+                micButton.classList.remove('listening');
+                console.error('Erreur de reconnaissance vocale: ' + event.error);
+                addMessage(`(Erreur : ${event.error})`, 'ai');
+            };
+
+            recognition.start();
+        }
+
+        // Gère l'envoi via le bouton (texte) ou le micro (vocale)
+        function handleInput(type) {
+            if (type === 'voice') {
+                startVoiceInput();
+                return;
+            }
+
+            const inputElement = document.getElementById('user-input');
+            const answer = inputElement.value.trim();
+
+            if (answer === '') {
+                return;
+            }
+            
+            // Pour l'entrée texte sans sélection d'option, la valeur et le label sont identiques
+            sendAnswer(answer, answer); 
+            inputElement.value = ''; 
+        }
+
+
+        // Fonction principale pour envoyer la réponse au serveur
+        async function sendAnswer(value, label) {
+            // 1. Désactiver les boutons pendant le traitement
+            document.querySelectorAll('.option-button').forEach(btn => btn.disabled = true);
+            document.getElementById('send-button').disabled = true;
+            document.getElementById('mic-button').disabled = true;
+
+            // 2. Afficher le message de l'utilisateur
+            if (label) {
+                addMessage(label, 'user');
+            }
+            
+            // 3. Préparer les données pour l'API Flask
+            const payload = {
+                user_answer: String(value), // Convertir en chaîne pour un transport JSON sûr
+                current_question_key: currentQuestionKey
+            };
+
+            try {
+                const response = await fetch('/chat', { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                // Si l'erreur HTTP (4xx ou 5xx) est levée
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                // 4. Traitement de la réponse
+                if (data.status === 'match_found') {
+                    // Redirection vers la page d'attente pour lancer le matching final
+                    window.location.href = '/waiting'; 
+                    return;
+                }
+                
+                if (data.status === 'continue') {
+                    // Mettre à jour la clé de la question courante et afficher le message de l'IA
+                    currentQuestionKey = data.next_question.key;
+                    addMessage(data.ai_message, 'ai', data.options || []);
+                    speak(data.ai_message); // Lire le message de l'IA à voix haute
+                } else if (data.status === 'error') {
+                    addMessage(`[ERREUR SYSTÈME]: ${data.ai_message}`, 'ai');
+                }
+
+            } catch (error) {
+                console.error('Erreur lors de la communication avec le serveur:', error);
+                addMessage("Désolé, une erreur de communication est survenue. Veuillez réessayer.", 'ai');
+            } finally {
+                // 5. Réactiver les boutons
+                document.getElementById('send-button').disabled = false;
+                document.getElementById('mic-button').disabled = false;
+            }
+        }
+
+        // Gestion de l'envoi avec la touche Entrée
+        document.getElementById('user-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                document.getElementById('send-button').click();
+            }
+        });
+
+        // Fonction d'initialisation pour commencer le chat
+        function initChat() {
+            // L'appel initial commence la séquence de questions
+            sendAnswer(null, null); 
+        }
+
+        window.onload = initChat;
+    </script>
+</body>
+</html>

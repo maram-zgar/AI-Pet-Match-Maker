@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recherche en cours...</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  background: linear-gradient(135deg, #f5e6e3 0%, #f0d8d4 50%, #e8c4bd 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Poppins', sans-serif;
+  overflow: hidden;
+  position: relative;
+}
+
+.waiting-container {
+  text-align: center;
+  z-index: 10;
+  position: relative;
+}
+
+.loader {
+  width: 80px;
+  height: 80px;
+  border: 6px solid rgba(212, 150, 143, 0.3);
+  border-top: 6px solid #d4968f;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 30px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+h2 {
+  font-size: 2.5em;
+  color: #b87169;
+  font-weight: 600;
+  margin-bottom: 15px;
+  text-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+p {
+  font-size: 1.2em;
+  color: #a85e56;
+  font-weight: 300;
+}
+
+/* Simplification des animations d'animaux pour ne pas dépendre de /static/anX.png */
+.animal {
+  position: absolute;
+  font-size: 80px;
+  opacity: 0;
+  transition: all 0.5s ease-out;
+  /* Utilisation d'emoji comme fallback */
+  font-size: 100px; 
+}
+
+.animal.show {
+  opacity: 1;
+  transform: none !important;
+}
+
+.animal-right {
+  right: -100px;
+  top: 30%;
+}
+
+.animal-right.show {
+  right: 150px;
+}
+
+.animal-left {
+  left: -100px;
+  top: 70%;
+}
+
+.animal-left.show {
+  left: 150px;
+}
+
+.animal-top {
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.animal-top.show {
+  top: 100px;
+}
+</style>
+</head>
+<body>
+  <div class="animal animal-right" id="animal1">
+    🐶
+  </div>
+  
+  <div class="animal animal-left" id="animal2">
+    🐈
+  </div>
+  
+  <div class="animal animal-top" id="animal3">
+    🐾
+  </div>
+
+  <div class="waiting-container">
+    <div class="loader"></div>
+    <h2>Recherche en cours...</h2>
+    <p>Nous analysons le match parfait pour toi ! 🧠</p>
+  </div>
+
+  <script>
+    // Ces timeouts simulent le temps de calcul du matching sur le serveur
+    setTimeout(() => {
+      document.getElementById('animal1').classList.add('show');
+    }, 500);
+
+    setTimeout(() => {
+      document.getElementById('animal2').classList.add('show');
+    }, 1000);
+
+    setTimeout(() => {
+      document.getElementById('animal3').classList.add('show');
+    }, 1500);
+
+    // Redirection vers les résultats après 2.5 secondes
+    setTimeout(() => {
+      window.location.href = '/results'; 
+    }, 2500); 
+  </script>
+</body>
+</html>

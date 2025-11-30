@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Match | Résultats</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Styles généraux pour l'harmonie avec le chatbot/index */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f5f5; /* Fond légèrement grisé */
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .results-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #b87169;
+            text-align: center;
+            font-weight: 700;
+        }
+        .summary {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+            color: #666;
+        }
+
+        /* Style de la meilleure correspondance */
+        .best-match-card {
+            border: 2px solid #d4968f;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            background-color: #fff9f8;
+            transition: transform 0.3s;
+        }
+        .best-match-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+        .match-title {
+            color: #b87169;
+            font-size: 1.8em;
+            text-align: center;
+            margin-top: 0;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .match-details {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+        .pet-photo img {
+            width: 250px;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .pet-summary {
+            flex-grow: 1;
+        }
+        .pet-summary p {
+            margin: 8px 0;
+        }
+        .description {
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+            font-style: italic;
+        }
+
+        /* Bouton de détails */
+        .details-btn {
+            background-color: #6c757d; /* Gris foncé pour contraste */
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 15px;
+            transition: background-color 0.3s;
+        }
+        .details-btn:hover {
+            background-color: #5a6268;
+        }
+
+        /* Autres Matches */
+        h3 {
+            color: #b87169;
+            border-bottom: 1px solid #d4968f;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+        .other-matches-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .other-match-card {
+            background-color: #fdfdfd;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .other-pet-photo {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .other-pet-info h4 {
+            margin: 0 0 5px 0;
+            color: #4a4a4a;
+        }
+        .other-pet-info p {
+            margin: 0 0 5px 0;
+            font-size: 0.9em;
+            color: #777;
+        }
+        .details-link {
+            color: #b87169;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Bouton Recommencer */
+        .start-btn {
+            background: linear-gradient(135deg, #d4968f 0%, #b87169 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 20px rgba(212, 150, 143, 0.4);
+            text-decoration: none;
+            display: inline-block;
+        }
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(212, 150, 143, 0.5);
+        }
+
+        /* Responsivité */
+        @media (max-width: 768px) {
+            .results-container {
+                padding: 20px;
+                margin: 20px auto;
+            }
+            .match-details {
+                flex-direction: column;
+                align-items: center;
+            }
+            .pet-photo img {
+                width: 100%;
+                max-width: 250px;
+                height: auto;
+            }
+            .other-matches-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="results-container">
+        <h1> Votre Match Parfait ! </h1>
+        <p class="summary">Basé sur vos préférences, voici votre compagnon idéal ainsi que quelques autres excellentes options.</p>
+
+        {% if best_match %}
+        <div class="best-match-card">
+            <!-- La similarité est affichée ici : "{{ best_match.similarity_percentage }}%" -->
+            <h2 class="match-title">{{ best_match.name }} (Score: {{ best_match.match_score }}%)</h2>
+            
+            <div class="match-details">
+                <!-- LOGIQUE D'IMAGE CORRIGÉE : Utilise directement img_url, l'attribut onerror gère le fallback si l'URL est invalide ou vide. -->
+                <div class="pet-photo">
+                    <img src="{{ best_match.img_url }}" 
+                         alt="Photo de {{ best_match.name }}" 
+                         loading="lazy">
+                </div>
+
+                <div class="pet-summary">
+                    <!-- Afficher les infos principales -->
+                    <p><strong>Espèce:</strong> {{ best_match.species }}</p>
+                    <p><strong>Race:</strong> {{ best_match.breed }}</p>
+                    <p><strong>Âge:</strong> {{ best_match.age }} ans</p>
+                    <p><strong>Sexe:</strong> {{ best_match.sex }}</p>
+                    <a href="{{ url_for('pet_info', pet_id=best_match['id']) }}" class="details-btn">Voir les détails complets</a>
+                </div>
+            </div>
+            <p class="description">{{ best_match.description }}</p>
+        </div>
+        {% else %}
+        <p class="no-match">Désolé, nous n'avons trouvé aucun animal correspondant à vos critères.</p>
+        {% endif %}
+
+        {% if other_matches %}
+        <hr>
+        <h3>Autres Matches Recommandés</h3>
+        <div class="other-matches-grid">
+            {% for pet in other_matches %}
+            <div class="other-match-card">
+                <!-- LOGIQUE D'IMAGE CORRIGÉE -->
+                <img src="{{ pet.img_url }}" 
+                     alt="Photo de {{ pet.name }}" 
+                     class="other-pet-photo"
+                     loading="lazy">
+                <div class="other-pet-info">
+                    <h4>{{ pet.name }} ({{ pet.match_score }}%)</h4>
+                    <p>{{ pet.species }}, {{ pet.age }} ans</p>
+                    <a href="{{ url_for('pet_info', pet_id=pet['id']) }}" class="details-link">Détails</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Bouton pour recommencer le chat -->
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="{{ url_for('home') }}" class="start-btn" style="text-decoration: none;"> recommencer </a>
+    </div>
+
+</body>
+</html>
